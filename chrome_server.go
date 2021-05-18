@@ -156,6 +156,7 @@ func Evaluate(url string, name string, user string, js string, x chan interface{
 		} else {
 			fmt.Println(string(out))
 		}
+		time.Sleep(time.Second * 5)
 	}
 }
 
