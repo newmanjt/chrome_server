@@ -18,6 +18,7 @@ type GlobalRequest struct {
 	ID       string
 	Url      string
 	JS       string
+	Path     string
 	RespChan chan interface{}
 }
 
@@ -84,7 +85,7 @@ func RemoteServer() {
 				var timing PerformanceTiming
 
 				json.Unmarshal([]byte(res.(string)), &timing)
-				err = GlobalRemote.SaveScreenshot("./data/screenshots/"+req.ID, 0644, 0, true)
+				err = GlobalRemote.SaveScreenshot(req.Path+"/data/screenshots/"+req.ID, 0644, 0, true)
 				if err != nil {
 					fmt.Println(err.Error())
 					continue
@@ -143,12 +144,12 @@ func Search(url string, js string) interface{} {
 	}
 }
 
-func Evaluate(url string, name string, user string, js string, x chan interface{}, thumb_size string) {
+func Evaluate(url string, name string, user string, js string, x chan interface{}, thumb_size string, path string) {
 	tab := NewTab(url)
 	time.Sleep(2 * time.Second)
-	RemoteChan <- GlobalRequest{ID: name, Type: "evaluate", Tab: tab, JS: js, RespChan: x}
+	RemoteChan <- GlobalRequest{ID: name, Type: "evaluate", Tab: tab, JS: js, RespChan: x, Path: path}
 	for {
-		cmd := exec.Command("sudo", "-u", user, "convert", "./data/screenshots/"+name, "-resize", thumb_size, "./data/screenshots/small_"+name)
+		cmd := exec.Command("sudo", "-u", user, "convert", "./data/screenshots/"+name, "-resize", thumb_size, path+"/data/screenshots/small_"+name)
 		out, err := cmd.CombinedOutput()
 		if err == nil {
 			break
